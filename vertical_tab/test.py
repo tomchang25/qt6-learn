@@ -1,4 +1,5 @@
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtGui, QtWidgets
+from v1 import TabWidget
 
 
 class Color(QtWidgets.QWidget):
@@ -11,93 +12,46 @@ class Color(QtWidgets.QWidget):
         self.setPalette(palette)
 
 
-class TabBar(QtWidgets.QTabBar):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+class Template(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
 
-        self.tabBarSize = QtCore.QSize(120, 40)
-        self.hoverColor = QtGui.QColor(255, 0, 255)
-        self.selectedColor = QtGui.QColor(0, 255, 255)
+        tab1 = QtWidgets.QWidget()
+        tab1_layout = QtWidgets.QHBoxLayout()
+        tab1_layout.addWidget(Color("yellow"))
+        tab1_layout.addWidget(Color("red"))
+        tab1.setLayout(tab1_layout)
 
-    def tabSizeHint(self, index):
-        return self.tabBarSize
+        tab2 = QtWidgets.QWidget()
+        tab2_layout = QtWidgets.QVBoxLayout()
+        tab2_layout.addWidget(Color("red"))
+        tab2_layout.addWidget(Color("yellow"))
+        tab2_layout.addWidget(Color("purple"))
+        tab2.setLayout(tab2_layout)
 
-    def paintEvent(self, event: QtGui.QPaintEvent):
-        painter_style = QtWidgets.QStylePainter(self)
-        painter_qp = QtGui.QPainter(self)
-        option_style = QtWidgets.QStyleOptionTab()
+        tab3 = QtWidgets.QWidget()
+        tab3_layout = QtWidgets.QStackedLayout()
+        tab3_layout.addWidget(Color("red"))
+        tab3_layout.addWidget(Color("yellow"))
+        tab3_layout.addWidget(Color("purple"))
+        tab3.setLayout(tab3_layout)
 
-        for index in range(self.count()):
-            self.initStyleOption(option_style, index)
-            tab_rect = self.tabRect(index)
+        tab = TabWidget()
+        tab.addTab(tab1, QtGui.QIcon("files/project.png"), "Project")
+        tab.addTab(tab2, QtGui.QIcon("files/transcribe.png"), "Transcribe")
+        tab.addTab(tab3, QtGui.QIcon("files/translate.png"), "Translate")
 
-            # # Hover check
-            # if self.tabRect(index).contains(self.mapFromGlobal(QtGui.QCursor.pos())):
-            #     painter_qp.fillRect(tab_rect, self.hoverColor)
+        grid = QtWidgets.QGridLayout(self)
+        grid.addWidget(tab)
 
-            # # Click check
-            # if self.currentIndex() == index:
-            #     painter_qp.fillRect(tab_rect, self.selectedColor)
-            painter_style.drawControl(QtWidgets.QStyle.ControlElement.CE_TabBarTabShape, option_style)
-
-            # Draw the tabbar
-            painter_style.save()
-
-            s = option_style.rect.size()
-            s.transpose()
-            r = QtCore.QRect(QtCore.QPoint(), s)
-            r.moveCenter(option_style.rect.center())
-
-            option_style.rect = r
-
-            c = tab_rect.center()
-            painter_style.translate(c)
-            painter_style.rotate(90)
-            painter_style.translate(-c)
-            painter_style.drawControl(QtWidgets.QStyle.ControlElement.CE_TabBarTabLabel, option_style)
-
-            painter_style.restore()
-
-
-class TabWidget(QtWidgets.QTabWidget):
-    def __init__(self, *args, **kwargs):
-        QtWidgets.QTabWidget.__init__(self, *args, **kwargs)
-        self.setTabBar(TabBar(self))
-        self.setTabPosition(QtWidgets.QTabWidget.TabPosition.West)
+        self.resize(640, 480)
 
 
 if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    # QtWidgets.QApplication.setStyle(ProxyStyle())
-
-    tab1 = QtWidgets.QWidget()
-    tab1_layout = QtWidgets.QHBoxLayout()
-    tab1_layout.addWidget(Color("yellow"))
-    tab1_layout.addWidget(Color("red"))
-    tab1.setLayout(tab1_layout)
-
-    tab2 = QtWidgets.QWidget()
-    tab2_layout = QtWidgets.QVBoxLayout()
-    tab2_layout.addWidget(Color("red"))
-    tab2_layout.addWidget(Color("yellow"))
-    tab2_layout.addWidget(Color("purple"))
-    tab2.setLayout(tab2_layout)
-
-    tab3 = QtWidgets.QWidget()
-    tab3_layout = QtWidgets.QStackedLayout()
-    tab3_layout.addWidget(Color("red"))
-    tab3_layout.addWidget(Color("yellow"))
-    tab3_layout.addWidget(Color("purple"))
-    tab3.setLayout(tab3_layout)
-
-    w = TabWidget()
-    w.addTab(tab1, QtGui.QIcon("zoom.png"), "ABC")
-    w.addTab(tab2, QtGui.QIcon("zoom-in.png"), "ABCDEFGH")
-    w.addTab(tab3, QtGui.QIcon("zoom-out.png"), "XYZ")
-
-    w.resize(640, 480)
-    w.show()
-
+    # app.setStyle("Oxygen")
+    window = Template()
+    window.show()
     sys.exit(app.exec())
